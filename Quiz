@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LEVEL UP Assessment</title>
+  <!-- Tailwind via CDN for quick styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- jsPDF + html2canvas for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-/8a7rY8gk6fWjQ0z8N3E2z8k1W5vJqf1s+q9b3q0ZpV3j8r1m0YgQnF0I0Qq8r5m8z3b1a1f0g0m1S6r0x0l0w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNa5H7R2eP3rVt3r3j0HcLxD3b2T4t3oS4F6o5Z7a8J9K0L1M2N3O4P5Q6R7S8T9U0V1W2X3Y4Z5A6B7C8D9w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    .max-w-prose { max-width: 72ch; }
+    .question { scroll-margin-top: 80px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <div class="mx-auto max-w-3xl p-6">
+    <!-- Header -->
+    <header class="mb-6">
+      <h1 class="text-3xl font-extrabold tracking-tight">LEVEL UP Assessment</h1>
+      <p class="text-slate-600 mt-2 max-w-prose">Answer a few questions (2–3 mins) and instantly get a <strong>personalised outline</strong> based on your goals, lifestyle, and preferences — plus a downloadable PDF you can keep. If you opt in, we’ll also email it to you.</p>
+    </header>
+
+    <!-- Config block (edit these for your brand) -->
+    <script>
+      const BRAND = {
+        NAME: "Your Brand",
+        CONTACT_EMAIL: "hello@yourbrand.com",
+        CHALLENGE_LINK: "https://example.com/6-week-challenge",
+        TRIAL_LINK: "https://example.com/30-day-trial",
+        WEBHOOK_URL: "" // Optional: paste a Zapier/Make/Sheets webhook URL to receive submissions
+      };
+    </script>
+
+    <!-- Form Card -->
+    <main class="bg-white shadow-sm ring-1 ring-slate-200 rounded-2xl p-5">
+      <form id="quiz" class="space-y-6">
+        <!-- Contact -->
+        <section class="grid gap-4 md:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium">Name</label>
+            <input name="name" type="text" placeholder="First name" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Email <span class="text-rose-600">*</span></label>
+            <input name="email" type="email" required placeholder="you@example.com" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500" />
+          </div>
+        </section>
+
+        <!-- Goals & Time -->
+        <section class="grid gap-4 md:grid-cols-2">
+          <div class="question">
+            <label class="block text-sm font-medium">Primary goal <span class="text-rose-600">*</span></label>
+            <select name="goal" required class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option value="">Choose…</option>
+              <option>Lose body fat</option>
+              <option>Get stronger / tone up</option>
+              <option>Feel better (energy / confidence)</option>
+            </select>
+          </div>
+          <div class="question">
+            <label class="block text-sm font-medium">Time available per week</label>
+            <select name="time" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option>< 2 hours</option>
+              <option>2–3 hours</option>
+              <option>3–4 hours</option>
+              <option>4+ hours</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Training prefs -->
+        <section class="grid gap-4 md:grid-cols-3">
+          <div class="question">
+            <label class="block text-sm font-medium">Train mostly…</label>
+            <select name="place" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option>At home</option>
+              <option>At the gym</option>
+            </select>
+          </div>
+          <div class="question">
+            <label class="block text-sm font-medium">Experience</label>
+            <select name="experience" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option>New / returning</option>
+              <option>Some experience</option>
+              <option>Consistent last 6+ months</option>
+            </select>
+          </div>
+          <div class="question">
+            <label class="block text-sm font-medium">Equipment</label>
+            <select name="equipment" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option>None</option>
+              <option>Bands / DBs</option>
+              <option>Full gym</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Lifestyle -->
+        <section class="grid gap-4 md:grid-cols-2">
+          <div class="question">
+            <label class="block text-sm font-medium">Biggest barrier right now</label>
+            <select name="barrier" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option>Time</option>
+              <option>Stress</option>
+              <option>Motivation</option>
+              <option>Pain / injury</option>
+              <option>Confidence</option>
+              <option>Nutrition confusion</option>
+            </select>
+          </div>
+          <div class="question">
+            <label class="block text-sm font-medium">Typical sleep</label>
+            <select name="sleep" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option>< 6 hours</option>
+              <option>6–7 hours</option>
+              <option>7–8 hours</option>
+              <option>8+ hours</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="grid gap-4 md:grid-cols-3">
+          <div class="question">
+            <label class="block text-sm font-medium">Cravings</label>
+            <select name="cravings" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option>Most days</option>
+              <option>Sometimes</option>
+              <option>Rarely</option>
+            </select>
+          </div>
+          <div class="question">
+            <label class="block text-sm font-medium">Steps on a usual day</label>
+            <select name="steps" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option>< 5,000</option>
+              <option>5–8k</option>
+              <option>8–10k</option>
+              <option>10k+</option>
+            </select>
+          </div>
+          <div class="question">
+            <label class="block text-sm font-medium">Nutrition style</label>
+            <select name="nutrition" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option>No tracking please</option>
+              <option>Portion plate</option>
+              <option>Track protein / calories</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="grid gap-4 md:grid-cols-2">
+          <div class="question">
+            <label class="block text-sm font-medium">Cycle / menopause</label>
+            <select name="cycle" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option>N/A</option>
+              <option>Regular, manageable</option>
+              <option>Noticed PMS / period pain</option>
+              <option>Peri / post menopause</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2 pt-6">
+            <input id="consent" name="consent" type="checkbox" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+            <label for="consent" class="text-sm text-slate-700">Email me my plan and occasional tips. You can unsubscribe anytime.</label>
+          </div>
+        </section>
+
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <button class="px-5 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300" type="submit">Get my score & plan</button>
+          <p class="text-xs text-slate-500">By continuing you agree to our privacy notice. Nothing is shared publicly.</p>
+        </div>
+      </form>
+    </main>
+
+    <!-- Results -->
+    <section id="resultCard" class="hidden mt-6 bg-white shadow-sm ring-1 ring-slate-200 rounded-2xl p-5">
+      <div class="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h2 class="text-2xl font-bold">Your LEVEL UP plan</h2>
+          <p class="text-slate-600">Tailored from your answers. Save it as a PDF or have it emailed to you.</p>
+        </div>
+        <div class="flex gap-2">
+          <button id="downloadPdf" class="px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700">Download PDF</button>
+          <button id="emailBtn" class="px-4 py-2 rounded-lg bg-slate-800 text-white font-semibold hover:bg-slate-900">Email it to me</button>
+        </div>
+      </div>
+
+      <div id="scorePill" class="mt-4 inline-flex items-center gap-2 rounded-full bg-indigo-50 text-indigo-700 px-3 py-1 text-sm font-semibold"></div>
+
+      <article id="plan" class="mt-4 prose prose-slate max-w-none"></article>
+
+      <div class="mt-6 border-t pt-4 text-sm text-slate-500">
+        <p>Next steps: based on your level, we’ll recommend either our <a class="text-indigo-600 underline" id="ctaChallenge" target="_blank">6‑Week Challenge</a> or the <a class="text-indigo-600 underline" id="ctaTrial" target="_blank">30‑Day Trial (£97)</a>.</p>
+      </div>
+    </section>
+
+    <footer class="mt-10 text-center text-xs text-slate-500">
+      <p>© <span id="year"></span> <span id="brandName"></span>. All rights reserved. This is guidance only and not medical advice.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Utility: get value helper
+    function v(fd, key, fallback = "") { return (fd.get(key) || fallback).toString(); }
+
+    function scoreFrom(fd) {
+      let score = 0;
+      const time = v(fd, 'time', '2–3 hours');
+      const exp = v(fd, 'experience', 'New / returning');
+      const sleep = v(fd, 'sleep', '6–7 hours');
+      const steps = v(fd, 'steps', '5–8k');
+      const cravings = v(fd, 'cravings', 'Sometimes');
+      const barrier = v(fd, 'barrier', 'Time');
+      const nutrition = v(fd, 'nutrition', 'Portion plate');
+      const place = v(fd, 'place', 'At home');
+
+      // Time
+      if (time.includes('< 2')) score += 0; else if (time.includes('2–3')) score += 2; else if (time.includes('3–4')) score += 3; else score += 4;
+      // Experience
+      if (exp.startsWith('New')) score += 0; else if (exp.startsWith('Some')) score += 2; else score += 4;
+      // Sleep
+      if (sleep.includes('< 6')) score += 0; else if (sleep.includes('6–7')) score += 1; else if (sleep.includes('7–8')) score += 3; else score += 4;
+      // Steps
+      if (steps.includes('< 5')) score += 0; else if (steps.includes('5–8')) score += 1; else if (steps.includes('8–10')) score += 2; else score += 3;
+      // Cravings
+      if (cravings.includes('Most')) score += 0; else if (cravings.includes('Sometimes')) score += 1; else score += 3;
+      // Barrier
+      if (barrier.includes('Pain')) score -= 1; else if (barrier.includes('Motivation') || barrier.includes('Confidence')) score += 1; // others 0
+      // Nutrition comfort
+      if (nutrition.includes('No tracking')) score += 1; else if (nutrition.includes('Portion')) score += 2; else score += 3;
+      // Place
+      if (place.includes('home')) score += 2; else score += 3;
+
+      // Clamp 0–20
+      score = Math.max(0, Math.min(20, score));
+      return score;
+    }
+
+    function levelFrom(score) {
+      if (score <= 7) return { level: 1, label: 'Reset', colour: 'bg-rose-50 text-rose-700' };
+      if (score <= 14) return { level: 2, label: 'Build', colour: 'bg-amber-50 text-amber-700' };
+      return { level: 3, label: 'Level Up', colour: 'bg-emerald-50 text-emerald-700' };
+    }
+
+    function blueprint(fd, level) {
+      const time = v(fd, 'time');
+      const place = v(fd, 'place');
+      const exp = v(fd, 'experience');
+      const slots = time.includes('< 2') ? '3 × 20–25 min' : time.includes('2–3') ? '3 × 35–40 min' : time.includes('3–4') ? '3 × 45–50 min' : '4 × 45–50 min';
+
+      const days = ['Mon','Wed','Fri'];
+      const sched = level === 4 ? 'Mon • Tue • Thu • Sat' : 'Mon • Wed • Fri';
+
+      const sessions = place.includes('home')
+        ? ['Full‑body strength (bodyweight + DB)', 'Intervals: 6–8 rounds × 60s easy / 30s brisk', 'Full‑body strength + core']
+        : ['Lower body + push (machines/DB)', 'Intervals: bike/row 6–8 × 90s easy / 30s hard', 'Upper body + hinge (machines/DB)'];
+
+      if (time.includes('4+')) sessions.push('Cardio or steps focus (45–60 mins)');
+
+      return `
+        <h3 class="text-xl font-bold">Realistic training blueprint (${slots}/week)</h3>
+        <ul>
+          <li><strong>Schedule:</strong> ${time.includes('4+') ? 'Mon • Tue • Thu • Sat' : 'Mon • Wed • Fri'} — school‑run friendly windows (early AM, lunch, or 7–8pm).</li>
+          <li><strong>Sessions:</strong> ${sessions.join(' • ')}</li>
+          <li><strong>Progression:</strong> Add a rep each week or +1–2kg when all sets feel solid.</li>
+          <li><strong>Experience tweak:</strong> ${exp.startsWith('New') ? 'Start with 2 sets per exercise and master technique.' : exp.startsWith('Some') ? 'Work 3 sets, controlled tempo (2–1–2).' : 'Aim for 3–4 sets, track lifts, and rotate variations every 4 weeks.'}</li>
+        </ul>
+      `;
+    }
+
+    function foodGuide(fd) {
+      const style = v(fd, 'nutrition');
+      const guide = style.includes('Track')
+        ? 'Target ~25–35g protein per meal, 80–90% of usual calories on rest days, 100% on training days.'
+        : style.includes('Portion')
+          ? 'Use the “1‑plate method”: 1 palm protein • 1 cupped‑hand carbs • 1–2 fists colour • 1 thumb fats. No bland diet food required.'
+          : 'Keep it simple: protein at each meal + colourful veg + a smart carb. Saucy, creamy, spicy meals are absolutely in.';
+      return `
+        <h3 class="text-xl font-bold">Family‑friendly food guide</h3>
+        <ul>
+          <li>${guide}</li>
+          <li>Easy templates: 
+            <em>Stir‑fry</em> (chicken/prawns + mixed veg + rice + your favourite sauce), 
+            <em>Tray‑bake</em> (salmon/pork + potatoes + peppers/onions), 
+            <em>Taco night</em> (beef/lamb mince, wraps, salsa, yoghurt or cheese).</li>
+          <li>Snack swaps: jerky, Greek‑style yoghurt, cheese & fruit, protein shake + banana.</li>
+        </ul>
+      `;
+    }
+
+    function environmentTweaks(fd) {
+      const barrier = v(fd, 'barrier');
+      const tweaks = [
+        'Put protein‑forward snacks at eye level; move sweets to a closed cupboard.',
+        'Set a water “trigger”: drink whenever you sit down to work or make a coffee.',
+        'Lay out gym kit and fill your bottle the night before.'
+      ];
+      if (barrier.includes('Time')) tweaks[0] = 'Batch‑cook a protein + frozen veg on Sundays; default lunches for the week in 10 minutes.';
+      if (barrier.includes('Stress')) tweaks[1] = '2‑minute box‑breathing before meals; defend a 10‑minute daily walk for headspace.';
+      if (barrier.includes('Pain')) tweaks[2] = 'Swap high‑impact moves for bike/rower; use RPE 6–7 and avoid pain ranges.';
+      return `
+        <h3 class="text-xl font-bold">3 environment tweaks</h3>
+        <ol>
+          <li>${tweaks[0]}</li>
+          <li>${tweaks[1]}</li>
+          <li>${tweaks[2]}</li>
+        </ol>
+      `;
+    }
+
+    function badDay(fd) {
+      return `
+        <h3 class="text-xl font-bold">Bad‑day fallback</h3>
+        <ul>
+          <li>Minimums: 10‑minute walk • 1 set of each main exercise • Protein at each meal.</li>
+          <li>Plate it: protein + veg + a fist of carbs — then call it a win.</li>
+          <li>Reset: sleep on it; tomorrow starts fresh (no “start over Monday”).</li>
+        </ul>
+      `;
+    }
+
+    function cycleSupport(fd) {
+      const cycle = v(fd, 'cycle');
+      if (cycle.includes('PMS')) return `<h4 class="font-semibold">Cycle support</h4><p>During the late luteal phase, reduce training intensity (RPE −1), prioritise sleep, and bump protein + fibre to help with cravings.</p>`;
+      if (cycle.includes('Peri')) return `<h4 class="font-semibold">Peri / post‑menopause</h4><p>Prioritise full‑body strength 3×/week, daily walks, and 30–35g protein per meal. Keep intervals short/sharp and manage stress.</p>`;
+      return '';
+    }
+
+    function ctas(level) {
+      const challenge = `<a href="${BRAND.CHALLENGE_LINK}" target="_blank" class="text-indigo-600 underline">6‑Week Challenge</a>`;
+      const trial = `<a href="${BRAND.TRIAL_LINK}" target="_blank" class="text-indigo-600 underline">30‑Day Trial (£97)</a>`;
+      return level === 1
+        ? `<p><strong>Recommendation:</strong> Start with the ${trial} to nail consistency, then graduate into the ${challenge}.</p>`
+        : `<p><strong>Recommendation:</strong> Jump into the ${challenge}. If you prefer a gentler start, the ${trial} works great too.</p>`;
+    }
+
+    function renderPlan(fd) {
+      const score = scoreFrom(fd);
+      const { level, label, colour } = levelFrom(score);
+
+      // Score pill
+      const pill = document.getElementById('scorePill');
+      pill.className = `mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ${colour}`;
+      pill.innerHTML = `<span>Score: ${score}/20</span> • <span>Level ${level}: ${label}</span>`;
+
+      // Assemble plan HTML
+      const planEl = document.getElementById('plan');
+      const intro = `<p>Hi ${v(fd,'name','there')}, here’s your personalised outline based on your goals and lifestyle.</p>`;
+      const goalLine = `<p><strong>Goal:</strong> ${v(fd,'goal')} • <strong>Time:</strong> ${v(fd,'time')} • <strong>Place:</strong> ${v(fd,'place')}</p>`;
+      const sections = [
+        blueprint(fd, level),
+        foodGuide(fd),
+        environmentTweaks(fd),
+        badDay(fd),
+        cycleSupport(fd),
+        ctas(level)
+      ].join('');
+      planEl.innerHTML = intro + goalLine + sections;
+
+      // CTA links in footer
+      document.getElementById('ctaChallenge').href = BRAND.CHALLENGE_LINK;
+      document.getElementById('ctaTrial').href = BRAND.TRIAL_LINK;
+
+      // Reveal card
+      document.getElementById('resultCard').classList.remove('hidden');
+
+      // Return data for email/webhook
+      return { score, level, label, html: planEl.innerHTML };
+    }
+
+    function plainTextFromHtml(html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      return tmp.innerText.replace(/\n\n+/g, '\n').trim();
+    }
+
+    async function sendWebhook(payload) {
+      if (!BRAND.WEBHOOK_URL) return { ok: false, reason: 'No webhook configured' };
+      try {
+        const res = await fetch(BRAND.WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        return { ok: res.ok };
+      } catch (e) { return { ok: false, reason: e.message }; }
+    }
+
+    async function downloadPdf() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const article = document.getElementById('plan');
+      await doc.html(article, { x: 40, y: 40, html2canvas: { scale: 0.6, useCORS: true } });
+      const name = (document.querySelector('[name="name"]').value || 'LEVEL-UP-Plan').replace(/\s+/g,'-');
+      doc.save(`${name}-plan.pdf`);
+    }
+
+    async function emailPlan(fd, render) {
+      const consent = document.getElementById('consent').checked;
+      const email = v(fd,'email');
+      const name = v(fd,'name','Friend');
+      const { score, level, label, html } = render;
+      const text = `Hi ${name},%0D%0A%0D%0AHere is your LEVEL UP plan (Score ${score}/20 – Level ${level}: ${label}).%0D%0A%0D%0A` + encodeURIComponent(plainTextFromHtml(html)) + `%0D%0A%0D%0A— ${BRAND.NAME}`;
+
+      // Try webhook first (if configured), otherwise mailto fallback
+      let sent = { ok: false };
+      if (BRAND.WEBHOOK_URL) {
+        sent = await sendWebhook({ name, email, score, level, label, goal: v(fd,'goal'), time: v(fd,'time'), place: v(fd,'place'), created_at: new Date().toISOString(), html, text });
+      }
+
+      if (!sent.ok) {
+        const mailto = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent('Your LEVEL UP Plan')}&body=${text}`;
+        window.location.href = mailto;
+        return;
+      }
+
+      if (consent) alert('Plan sent! Check your inbox.'); else alert('Plan sent to our system. (Tip: tick the consent box next time to receive tips by email.)');
+    }
+
+    // Wire up submit
+    document.getElementById('quiz').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const render = renderPlan(fd);
+      // Auto‑scroll to results
+      document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Optional: auto‑email if consent checked
+      if (document.getElementById('consent').checked) {
+        emailPlan(fd, render);
+      }
+    });
+
+    // Buttons
+    // Enhanced: high-quality, multi-page A4 PDF export
+async function downloadPdfBetter() {
+  const { jsPDF } = window.jspdf;
+  const planEl = document.getElementById('plan');
+  if (!planEl || !planEl.innerHTML.trim()) { alert('Fill the assessment first to generate your plan.'); return; }
+
+  const name = (document.querySelector('[name="name"]').value || 'LEVEL-UP-Plan').trim();
+  const safeName = name.trim().replace(/ +/g, '-');
+  const dateStr = new Date().toISOString().slice(0,10);
+
+  const doc = new jsPDF('p', 'pt', 'a4');
+  const margin = 40;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  // Small header
+  doc.setFontSize(16);
+  doc.text('LEVEL UP Plan', margin, 30);
+  doc.setFontSize(10);
+  doc.text(`${name} • ${dateStr}`, margin, 46);
+
+  // Render the plan to canvas at high scale
+  const canvas = await html2canvas(planEl, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+  const imgData = canvas.toDataURL('image/png');
+
+  const imgWidth = pageWidth - margin * 2;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position = 60; // start below header
+
+  doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight, undefined, 'FAST');
+  heightLeft -= (pageHeight - position - margin);
+
+  while (heightLeft > 0) {
+    doc.addPage();
+    position = margin; // top margin on new pages
+    // shift the same long image upward to show the next slice
+    doc.addImage(imgData, 'PNG', margin, -(imgHeight - heightLeft) + position, imgWidth, imgHeight, undefined, 'FAST');
+    heightLeft -= (pageHeight - position - margin);
+  }
+
+  doc.setProperties({ title: `LEVEL UP Plan - ${name}` });
+  doc.save(`${safeName}-LEVEL-UP-Plan-${dateStr}.pdf`);
+}
+
+document.getElementById('downloadPdf').addEventListener('click', downloadPdfBetter);
+    document.getElementById('emailBtn').addEventListener('click', (e) => {
+      const fd = new FormData(document.getElementById('quiz'));
+      const render = { score: scoreFrom(fd), ...levelFrom(scoreFrom(fd)), html: document.getElementById('plan').innerHTML };
+      emailPlan(fd, render);
+    });
+
+    // Footer brand
+    document.getElementById('brandName').textContent = BRAND.NAME;
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
